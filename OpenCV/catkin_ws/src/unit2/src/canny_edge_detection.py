@@ -1,10 +1,13 @@
+```python
+#!/usr/bin/env python
+
 import rospy
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 import cv2
+import numpy as np
 
-
-class ShowingImage(object):
+class CannyFilter(object):
 
     def __init__(self):
     
@@ -17,15 +20,25 @@ class ShowingImage(object):
             cv_image = self.bridge_object.imgmsg_to_cv2(data, desired_encoding="bgr8")
         except CvBridgeError as e:
             print(e)
+
+          
         
-        cv2.imshow('image',cv_image)
-        cv2.waitKey(0)
+        img = cv2.resize(cv_image,(450,350))
 
+        #The canny detector uses two parameters appart from the image:
+        #The minimum and maximum intensity gradient
+        minV = 30
+        maxV = 100
 
+        edges = cv2.Canny(img,minV,maxV)
+        cv2.imshow('Original',img)
+        cv2.imshow('Edges',edges)
+
+        cv2.waitKey(1)
 
 def main():
-    showing_image_object = ShowingImage()
-    rospy.init_node('line_following_node', anonymous=True)
+    canny_filter_object = CannyFilter()
+    rospy.init_node('canny_filter_node', anonymous=True)
     try:
         rospy.spin()
     except KeyboardInterrupt:
@@ -34,3 +47,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+```
